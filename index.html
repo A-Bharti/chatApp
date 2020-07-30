@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+     
+       #main{
+           display: grid;
+           margin: 10px;
+           padding: 2px;
+           background-color: darkgray;
+           height: 95vh;
+           border: solid brown;
+       }
+       .content{
+           display: flex;
+           border-radius: 10px;
+       }
+       .writing{
+           justify-content: center;
+           color: white;
+           font-size: 30px;
+           margin: 0px;
+    
+       }
+       #inp{
+           font-size: large;
+           font-style: italic;
+           }
+        #btn{
+            height: 8vh;
+            width: 50vw;
+            font-size: 5vh;
+            font-weight: bolder;
+            justify-self:center;
+            justify-content: center;
+            color: white;
+            background-color: #41fc03;
+            border-radius: 50%;
+            align-items: center;
+           
+        
+        }
+        #ta{
+            display: inline;
+            border:solid black;
+            background-color: white;
+            height: 50vh;
+            overflow: auto;
+            font-family: Arial, Helvetica, sans-serif;
+            font-style: italic;
+            overflow: auto;
+            
+        }
+        li{
+                color:mediumblue;
+                border-bottom: dashed 0.5px;
+                /* font-size: 100px; */
+        }
+       
+        .right{
+            
+            list-style-position: inside;
+            text-align: right;
+            padding-right: 3px;
+            color:maroon
+        }
+       
+    </style>
+
+<script src = "/socket.io/socket.io.js"></script>
+   <script>
+      const name=prompt('Enter your name');
+      var room=prompt('Enter your room');
+      // <script>
+      // document.getElementById('Join').innerHTML="Your room Id is -> "+room;
+
+      // console.log(myid)
+      var socket = io();
+         socket.on('alert',(d)=>{
+            document.getElementById('Join').innerHTML="Someone joined now!!!!"
+            setTimeout(()=>{document.getElementById('Join').innerHTML="Your room Id is -> "+room},3000)
+         })
+         socket.emit('room',room);
+      function fun(){
+         var sms=document.getElementById("inp").value;
+         document.getElementById("inp").value=null;
+         socket.emit('sms',{name:name,sms:sms,room:room})
+      }
+      socket.on('sms',(sms)=>{
+         
+           var li=document.createElement('li');
+           li.innerHTML=sms.name+" : "+sms.sms;
+           if(sms.name===name)
+            li.classList.add("right");
+            document.getElementById("ta").appendChild(li);
+            
+         
+  
+      })
+    
+   </script>
+
+
+</head>
+<body>
+       
+        <div id="main">
+            <h3 style="text-align: center;color: red;background-color: seashell;">This is a learning App,Not secure!!!</h3>
+            <p class="content writing">Learning Chat App</p>
+        <ul id="ta" class="content">
+         
+         
+        </ul>
+        <input type="text" id="inp" placeholder="Your message" class="content">
+        <button onclick="fun()" class="content" id="btn">Send</button>
+        <h5 id="Join" class="content writing" style="color: red;"></h5>
+         </div>
+      
+
+    
+</body>
+</html>
