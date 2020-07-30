@@ -2,7 +2,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-const PORT=process.env.PORT;
+const port=process.env.PORT;
 app.get('/', function(req, res) {
    res.sendfile('index.html');
 });
@@ -26,6 +26,6 @@ io.on('connection', function(socket) {
   
 
 
-app.listen(PORT, function() {
+app.listen(port, function() {
    console.log('server started');
 });
