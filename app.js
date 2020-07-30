@@ -2,7 +2,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-const PORT=3000;
+const PORT=process.env.PORT;
 app.get('/', function(req, res) {
    res.sendfile('index.html');
 });
@@ -27,5 +27,5 @@ io.on('connection', function(socket) {
 
 
 http.listen(PORT, function() {
-   console.log('listening on *:3000');
+   console.log('server started');
 });
