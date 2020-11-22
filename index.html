@@ -1,130 +1,274 @@
-<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ChatApp</title>
-    <style>
-     
-       #main{
-           display: grid;
-           margin: 10px;
-           padding: 2px;
-           background-color: darkgray;
-           height: 95vh;
-           border: solid brown;
-       }
-       .content{
-           display: flex;
-           border-radius: 10px;
-          
-       }
-       .writing{
-           justify-content: center;
-           color: white;
-           font-size: 30px;
-           margin: 0px;
-         
-    
-       }
-       #inp{
-           font-size: large;
-           font-style: italic;
-           }
-        #btn{
-            height: 8vh;
-            width: 50vw;
-            font-size: 5vh;
-            font-weight: bolder;
-            justify-self:center;
-            justify-content: center;
-            color: white;
-            background-color: #41fc03;
-            border-radius: 50%;
-            align-items: center;
-            
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const name = prompt('Enter your name');
+        var room = prompt('Enter your room');
+         _ID="";
+        var socket = io();
+        function load()
+        {
+            document.getElementById('navbar').innerHTML="Your Room ID: "+room;
+        }
+        socket.on('name', (data) => {
+           var _name=data.name;
+          var  ID=data.id;
+            if(_ID=="")
+            _ID=ID;
            
-        
+            if(_ID!=ID){
+                toast(_name + " Joined the chat");
+            var div=document.createElement('div');
+            div.className="cards user w3-tangerine w3-xxlarge";
+            div.id=ID;
+            div.innerHTML=_name;
+            document.getElementById('user_list').appendChild(div);
+            }
+        });
+        socket.on('removed', (data) => {
+            var _name=data.name;
+           var ID=data.id;
+            toast(_name + " Left the chat");
+            var obj=document.getElementById(ID);
+            document.getElementById('user_list').removeChild(obj);
+        })
+        socket.emit('room', room);
+        socket.emit('name', name);
+        function fun() {
+            var sms = document.getElementById("inp").value;
+            document.getElementById("inp").value = null;
+            socket.emit('sms', { id: _ID, sms: sms, room: room ,name:name})
         }
-        #ta{
-            display: inline;
-            border:solid black;
-            background-color: white;
-            height: 50vh;
-            overflow: auto;
-            font-family: Arial, Helvetica, sans-serif;
-            font-style: italic;
-            overflow: auto;
-            
-        }
-        li{
-                color:mediumblue;
-                border-bottom: dashed 0.5px;
-                /* font-size: 100px; */
-         
-        }
-       
-        .right{
-            
-            list-style-position: inside;
-            text-align: right;
-            padding-right: 3px;
-            color:maroon
-        }
-       
-    </style>
+        socket.on('sms', (sms) => {
 
-<script src = "/socket.io/socket.io.js"></script>
-   <script>
-      const name=prompt('Enter your name');
-      var room=prompt('Enter your room');
-      // <script>
-      // document.getElementById('Join').innerHTML="Your room Id is -> "+room;
-
-      // console.log(myid)
-      var socket = io();
-         socket.on('alert',(d)=>{
-            document.getElementById('Join').innerHTML="Someone joined now!!!!"
-            setTimeout(()=>{document.getElementById('Join').innerHTML="Your room Id is -> "+room},3000)
-         })
-         socket.emit('room',room);
-      function fun(){
-         var sms=document.getElementById("inp").value;
-         document.getElementById("inp").value=null;
-         socket.emit('sms',{name:name,sms:sms,room:room})
-      }
-      socket.on('sms',(sms)=>{
-         
-           var li=document.createElement('li');
-           li.innerHTML=sms.name+" : "+sms.sms;
-           if(sms.name===name)
-            li.classList.add("right");
+            var li = document.createElement('li');
+            li.innerHTML = sms.name + " : " + sms.sms;
+            if (sms.id == _ID)
+                li.classList.add("left");
+            else
+                li.classList.add("right");
             document.getElementById("ta").appendChild(li);
-          
-            
-         
-  
-      })
-    
-   </script>
+            document.getElementById("ta").innerHTML+="<br>";
 
 
+
+        })
+        function toast(message) {
+            message = "!<br> Message: <i>" + message + "</i>"
+            console.log(message);
+
+            var card = document.createElement('div')
+            card.style.minWidth = "150px"
+            card.style.minHeight = "fit-content"
+            card.innerHTML = message;
+            card.style.position = "absolute"
+            card.style.right = "0px"
+            card.style.top = "0px"
+            card.style.color = "white"
+            card.style.backgroundColor = "#AE1438"
+            card.style.boxShadow = "0px 4px 8px rgba(0,0,0,0.8)"
+            card.style.margin = "15px"
+            card.style.padding = "10px"
+            card.style.textAlign = "center"
+            card.style.borderRadius = "20px"
+            document.body.appendChild(card)
+
+
+            var t = 2000;
+            setInterval(() => {
+
+                card.setAttribute("hidden",true);
+            }, t)
+
+
+        }
+    </script>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tangerine">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 </head>
-<body>
-       
-        <div id="main">
-            <h3 style="text-align: center;color: red;background-color: seashell;">This is a learning App,Not secure!!!</h3>
-            <p class="content writing">Learning Chat App</p>
-        <ul id="ta" class="content">
-         
-         
-        </ul>
-        <input type="text" id="inp" placeholder="Your message" class="content">
-        <button onclick="fun()" class="content" id="btn">Send</button>
-        <h5 id="Join" class="content writing" style="color: red;"></h5>
-         </div>
-      
+<style>
+    body {
+        background: lightsteelblue;
+    }
 
+   
+
+    #win {
+        background: white;
+        margin-top: 6%;
+        margin-left: 10%;
+        width: 80%;
+        height: 75%;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+
+    }
+
+    #navbar {
+        height: 5%;
+        width: 100%;
+        background: midnightblue;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        color: white;
+        text-align: center;
+        font-weight: bolder;
+        font-size: 20px;
+        margin: 0px;
+
+    }
+
+    #user_list {
+        float: left;
+        height: 95%;
+        width: 30%;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        margin:0px;
+
+    }
+
+    #message {
+        float: right;
+        height: 95%;
+        width: 70%;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        margin: 0px;
+        text-align: center;
+    }
+
+    #send {
+        height: 10%;
+        width: 100%;
+        box-shadow: 0px 0 10px rgba(0, 0, 0, 0.8);
+        text-align: center;
+        /* margin: auto; */
+    }
+    #sms{
+        height: 90%;
+        width: 100%;
+        /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); */
+        margin: 0px;
+    }
+
+    #btn {
+        background: #4834DF;
+        color: white;
+        border-radius: 50%;
+        border-color: white;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        font-size: 25px;
+        font-weight: bold;
+        height:80%;
+        width: 5%;
+
+    }
+
+    #inp {
+        background: #EAF0F1;
+        color: black;
+        font-style: italic;
+        border-radius: 5px;
+        border-color: white;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        width: 85%;
+        height: 70%;
+        /* margin-bottom:30px; */
+
+    }
+
+    #btn:hover {
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.8);
+        /* border-color: white; */
+    }
+
+    #inp:hover {
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    }
+#ta{
+    margin: 0px;
+}
+    .left {
+        list-style-position: inside;
+        border-color:white;
+        color:white;
+        background: #45CE30;
+        border-radius: 5px;
+        width: fit-content;
+        height: fit-content;
+        font-family: cursive;
+        display: block;
+        /* float: left; */
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+       padding: 2px 5px;
+
+    }
+
+    .right {
+        border-color:white;
+        color:white;
+        background: #3C40C6;
+        border-radius: 5px;
+        width: fit-content;
+        height: fit-content;
+        list-style-position: inside;
+        font-family: cursive;
+        display: block;
+        float: right;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        padding:2px 5px;
+        margin-right: 10px;
+        clear: both;
+        /* right:0px; */
+    }
+       
+    .user{
+        text-align: center;
+        /* font-family: 'URW Chancery L', cursive; */
+        display: inline-block;
+        width: 100%;
+        height: fit-content;
+        /* margin-left:15px; */
+        /* padding :10%; */
+        /* font-size: small; */
+        font-weight: bolder;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+
+    }
+    .w3-tangerine {
+  font-family: "Tangerine", serif;
+}
+</style>
+
+<body>
+
+
+    <div class="cards" id="win">
+        <div id="navbar">
+           <script>load()</script>
+
+        </div>
+
+        <div id="user_list"></div>
+
+        <div id="message">
+            <div id="sms"> <ul id="ta" class="content"></ul></div>
+            
+            <div id="send">
+                <input type="text" id="inp" placeholder="Your message" class="content">
+                <button onclick="fun()" class="content" id="btn"> > </button>
     
+            </div>
+        </div>
+
+        
+    </div>
+
+
 </body>
+
 </html>
