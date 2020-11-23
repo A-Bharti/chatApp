@@ -10,32 +10,44 @@
     <script>
         const name = prompt('Enter your name');
         var room = prompt('Enter your room');
-         _ID="";
+        _ID = "";
         var socket = io();
-        function load()
-        {
-            document.getElementById('navbar').innerHTML="Your Room ID: "+room;
+        function load() {
+            document.getElementById('navbar').innerHTML = "Your Room ID: " + room;
         }
+        socket.on('list', (data) => {
+            data.list.forEach(element => {
+                var id_ = element.id;
+                var name_ = element.name;
+                if (id_ != "NA") {
+                    var div = document.createElement('div');
+                    div.className = "cards user w3-tangerine w3-xxlarge";
+                    div.id = id_;
+                    div.innerHTML = name_;
+                    document.getElementById('user_list').appendChild(div);
+                }
+            });
+        })
         socket.on('name', (data) => {
-           var _name=data.name;
-          var  ID=data.id;
-            if(_ID=="")
-            _ID=ID;
-           
-            if(_ID!=ID){
+            var _name = data.name;
+            var ID = data.id;
+            if (_ID == "")
+                _ID = ID;
+
+            if (_ID != ID) {
                 toast(_name + " Joined the chat");
-            var div=document.createElement('div');
-            div.className="cards user w3-tangerine w3-xxlarge";
-            div.id=ID;
-            div.innerHTML=_name;
-            document.getElementById('user_list').appendChild(div);
+                var div = document.createElement('div');
+                div.className = "cards user w3-tangerine w3-xxlarge";
+                div.id = ID;
+                div.innerHTML = _name;
+                document.getElementById('user_list').appendChild(div);
             }
         });
         socket.on('removed', (data) => {
-            var _name=data.name;
-           var ID=data.id;
+            var _name = data.name;
+            var ID = data.id;
             toast(_name + " Left the chat");
-            var obj=document.getElementById(ID);
+            var obj = document.getElementById(ID);
             document.getElementById('user_list').removeChild(obj);
         })
         socket.emit('room', room);
@@ -43,7 +55,7 @@
         function fun() {
             var sms = document.getElementById("inp").value;
             document.getElementById("inp").value = null;
-            socket.emit('sms', { id: _ID, sms: sms, room: room ,name:name})
+            socket.emit('sms', { id: _ID, sms: sms, room: room, name: name })
         }
         socket.on('sms', (sms) => {
 
@@ -54,7 +66,7 @@
             else
                 li.classList.add("right");
             document.getElementById("ta").appendChild(li);
-            document.getElementById("ta").innerHTML+="<br>";
+            document.getElementById("ta").innerHTML += "<br>";
 
 
 
@@ -83,22 +95,22 @@
             var t = 2000;
             setInterval(() => {
 
-                card.setAttribute("hidden",true);
+                card.setAttribute("hidden", true);
             }, t)
 
 
         }
     </script>
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tangerine">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tangerine">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 </head>
 <style>
     body {
         background: lightsteelblue;
     }
 
-   
+
 
     #win {
         background: white;
@@ -128,7 +140,7 @@
         height: 95%;
         width: 30%;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-        margin:0px;
+        margin: 0px;
 
     }
 
@@ -148,7 +160,8 @@
         text-align: center;
         /* margin: auto; */
     }
-    #sms{
+
+    #sms {
         height: 90%;
         width: 100%;
         /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); */
@@ -163,7 +176,7 @@
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
         font-size: 25px;
         font-weight: bold;
-        height:80%;
+        height: 80%;
         width: 5%;
 
     }
@@ -189,13 +202,15 @@
     #inp:hover {
         box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     }
-#ta{
-    margin: 0px;
-}
+
+    #ta {
+        margin: 0px;
+    }
+
     .left {
         list-style-position: inside;
-        border-color:white;
-        color:white;
+        border-color: white;
+        color: white;
         background: #45CE30;
         border-radius: 5px;
         width: fit-content;
@@ -204,13 +219,13 @@
         display: block;
         /* float: left; */
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-       padding: 2px 5px;
+        padding: 2px 5px;
 
     }
 
     .right {
-        border-color:white;
-        color:white;
+        border-color: white;
+        color: white;
         background: #3C40C6;
         border-radius: 5px;
         width: fit-content;
@@ -220,13 +235,13 @@
         display: block;
         float: right;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-        padding:2px 5px;
+        padding: 2px 5px;
         margin-right: 10px;
         clear: both;
         /* right:0px; */
     }
-       
-    .user{
+
+    .user {
         text-align: center;
         /* font-family: 'URW Chancery L', cursive; */
         display: inline-block;
@@ -239,9 +254,10 @@
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 
     }
+
     .w3-tangerine {
-  font-family: "Tangerine", serif;
-}
+        font-family: "Tangerine", serif;
+    }
 </style>
 
 <body>
@@ -249,23 +265,25 @@
 
     <div class="cards" id="win">
         <div id="navbar">
-           <script>load()</script>
+            <script>load()</script>
 
         </div>
 
         <div id="user_list"></div>
 
         <div id="message">
-            <div id="sms"> <ul id="ta" class="content"></ul></div>
-            
+            <div id="sms">
+                <ul id="ta" class="content"></ul>
+            </div>
+
             <div id="send">
                 <input type="text" id="inp" placeholder="Your message" class="content">
                 <button onclick="fun()" class="content" id="btn"> > </button>
-    
+
             </div>
         </div>
 
-        
+
     </div>
 
 
